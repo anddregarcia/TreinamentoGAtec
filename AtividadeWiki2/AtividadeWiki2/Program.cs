@@ -30,33 +30,98 @@ namespace AtividadeWiki2
 {
     class Program
     {
+
+        #region Main
+
         static void Main(string[] args)
         {
-            List<OrdemDeServico> ListaDeOS = new List<OrdemDeServico>();
-            int comando = -1;
+            OpcaoMenu menu = OpcaoMenu.Menu_Principal;
+            ListaDeOS listaOS = new ListaDeOS();
+
+            listaOS.ListaOS.Add(new OrdemDeServico { Numero = 1, Abertura = DateTime.Now, Encerramento = null, Areas = null, Responsavel = "André" });
+            listaOS.ListaOS.Add(new OrdemDeServico { Numero = 2, Abertura = DateTime.Now.AddDays(-1), Encerramento = null, Areas = null, Responsavel = "André" });
+            listaOS.ListaOS.Add(new OrdemDeServico { Numero = 3, Abertura = DateTime.Now.AddDays(-2), Encerramento = null, Areas = null, Responsavel = "André" });
 
             while (true)
             {
                 InicializarMenu();
 
-                comando = ReceberComando();
+                var comando = Console.ReadLine();
 
-                switch (comando)
+                try
                 {
-                    case 0:
-                        return;
-                        break;
+                    menu = (OpcaoMenu)Convert.ToInt32(comando);
+                }
+                catch (Exception)
+                {
+                    Console.Write("Opção inválida");
+                    Console.Write("\nPressione 'enter' para continuar...\n");
+                    Console.ReadLine();
+                }
 
-                    case 1:
+                switch (menu)
+                {
+                    case OpcaoMenu.Sair:
+                        return;
+
+                    case OpcaoMenu.CriarNovaOS:
 
                         Console.Clear();
                         Console.Write("Digite a data da abertura da OS ou 0 para retornar ao Menu Principal: ");
-                        comando = ReceberComando();
+                        comando = Console.ReadLine();
 
-                        if (!comando.Equals(0))
+                        try
                         {
-                            OrdemDeServico os = new OrdemDeServico();
-                            while (RealizaAberturaDaOS(os, ListaDeOS)) { }
+                            if (comando != "0")
+                            {
+                                RealizaAberturaOS(listaOS, comando);
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            Console.Write("Opção inválida");
+                            Console.Write("\nPressione 'enter' para continuar...\n");
+                            Console.ReadLine();
+                        }
+
+                        break;
+
+                    case OpcaoMenu.ListaOS:
+
+                        Console.Clear();
+                        Console.Write("Lista de OS cadastradas no sistema\n\n");
+
+                        foreach (var item in listaOS.ListaOS)
+                        {
+                            Console.Write($"Código da OS: {item.Numero}, " +
+                                          $"Data de abertura: {item.Abertura}, " +
+                                          $"Responsável: {item.Responsavel}, " +
+                                          $"Encerramento: {item.Encerramento} \n");
+                        }
+
+                        Console.Write("\n\n\nPressione 'enter' para continuar...\n");
+                        Console.ReadLine();
+
+                        break;
+
+                    case OpcaoMenu.EncerrarOS:
+
+                        Console.Clear();
+                        Console.Write("Digite o número da OS a ser encerrada ou 0 para retornar ao Menu Principal: ");
+                        comando = Console.ReadLine();
+
+                        try
+                        {
+                            if (comando != "0")
+                            {
+                                RealizaEncerramentoOS(listaOS, comando);
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            Console.Write("Opção inválida");
+                            Console.Write("\nPressione 'enter' para continuar...\n");
+                            Console.ReadLine();
                         }
 
                         break;
@@ -64,51 +129,71 @@ namespace AtividadeWiki2
                     default:
                         break;
 
-
                 }
             }
         }
 
-        static bool RealizaAberturaDaOS(OrdemDeServico os, List<OrdemDeServico> lista)
+        #endregion
+
+        #region RealizaAberturaOS
+        static void RealizaAberturaOS(ListaDeOS listaOS, string data)
         {
+            OrdemDeServico os = new OrdemDeServico();
+
+            if (listaOS.ListaOS.Count > 0)
+                os.Numero = listaOS.ListaOS.Max(x => x.Numero) + 1;
+            else
+                os.Numero = 1;
+
             try
             {
-                if (lista.Count > 0)
-                    os.Numero = lista.Max(x => x.Numero) + 1;
-                else
-                    os.Numero = 1;
-
-                os.Abertura = Convert.ToDateTime(Console.ReadLine());
+                os.Abertura = Convert.ToDateTime(data);
+                Console.Write("\nInforme o nome do responsável: ");
                 os.Responsavel = Console.ReadLine();
+
+                listaOS.ListaOS.Add(os);
 
                 Console.Write("\nOS criada com sucesso. Pressione qualquer tecla para continuar...\n");
                 Console.ReadLine();
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Console.Write("\nOcorreu um erro na abertura da OS.\n" + ex.Message);
-                Console.ReadLine();
-                return false;
-            }
-
-        }
-
-        static int ReceberComando()
-        {
-            try
-            {
-                var comando = Convert.ToInt32(Console.ReadLine());
-                return comando;
             }
             catch (Exception)
             {
-                Console.Write("\nOpção inválida.\n");
+                Console.Write("\nOcorreu um erro na abertura da OS.");
+                Console.Write("\nPressione qualquer tecla para continuar...\n");
+                Console.ReadLine();
             }
-
-            return -1;
         }
 
+        #endregion
+
+        #region RealizaEncerramentoOS
+        static void RealizaEncerramentoOS(ListaDeOS listaOS, string numero)
+        {
+            OrdemDeServico os = new OrdemDeServico();
+
+            os = listaOS.ListaOS.Find(x => x.Numero.ToString() == numero);
+
+            try
+            {
+                Console.Write("\nInforme a data de encerramento: \n");
+                var data = Console.ReadLine();
+
+                os.Encerramento = Convert.ToDateTime(data);
+
+                Console.Write("\nOS encerrada com sucesso. Pressione qualquer tecla para continuar...\n");
+                Console.ReadLine();
+            }
+            catch (Exception)
+            {
+                Console.Write("\nOcorreu um erro na abertura da OS.");
+                Console.Write("\nPressione qualquer tecla para continuar...\n");
+                Console.ReadLine();
+            }
+        }
+
+        #endregion
+
+        #region InicializarMenu
         static void InicializarMenu()
         {
             Console.Clear();
@@ -120,8 +205,10 @@ namespace AtividadeWiki2
 
             Console.Write("Digite sua opção: ");
         }
+        #endregion
     }
 
+    #region Classes
     public class OrdemDeServico
     {
         public OrdemDeServico()
@@ -155,6 +242,28 @@ namespace AtividadeWiki2
         {
             return lista.Max(x => x.Numero) + 1;
         }
+    }
+
+    public class ListaDeOS
+    {
+        public ListaDeOS()
+        {
+            ListaOS = new List<OrdemDeServico>();
+        }
+
+        public List<OrdemDeServico> ListaOS { get; set; }
+    }
+
+    #endregion
+
+    public enum OpcaoMenu
+    {
+        Menu_Principal = -1,
+        Sair = 0,
+        CriarNovaOS = 1,
+        ListaOS = 2,
+        EncerrarOS = 3,
+        IncluirNovaArea = 4
     }
 
 }
