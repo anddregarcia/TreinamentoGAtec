@@ -1,0 +1,11 @@
+C:\Users\andre.garcia\source\repos\AtividadeWiki2\AtividadeWiki2\bin\Debug\netcoreapp2.1\AtividadeWiki2.deps.json
+C:\Users\andre.garcia\source\repos\AtividadeWiki2\AtividadeWiki2\bin\Debug\netcoreapp2.1\AtividadeWiki2.runtimeconfig.json
+C:\Users\andre.garcia\source\repos\AtividadeWiki2\AtividadeWiki2\bin\Debug\netcoreapp2.1\AtividadeWiki2.runtimeconfig.dev.json
+C:\Users\andre.garcia\source\repos\AtividadeWiki2\AtividadeWiki2\bin\Debug\netcoreapp2.1\AtividadeWiki2.dll
+C:\Users\andre.garcia\source\repos\AtividadeWiki2\AtividadeWiki2\bin\Debug\netcoreapp2.1\AtividadeWiki2.pdb
+C:\Users\andre.garcia\source\repos\AtividadeWiki2\AtividadeWiki2\obj\Debug\netcoreapp2.1\AtividadeWiki2.csprojAssemblyReference.cache
+C:\Users\andre.garcia\source\repos\AtividadeWiki2\AtividadeWiki2\obj\Debug\netcoreapp2.1\AtividadeWiki2.csproj.CoreCompileInputs.cache
+C:\Users\andre.garcia\source\repos\AtividadeWiki2\AtividadeWiki2\obj\Debug\netcoreapp2.1\AtividadeWiki2.AssemblyInfoInputs.cache
+C:\Users\andre.garcia\source\repos\AtividadeWiki2\AtividadeWiki2\obj\Debug\netcoreapp2.1\AtividadeWiki2.AssemblyInfo.cs
+C:\Users\andre.garcia\source\repos\AtividadeWiki2\AtividadeWiki2\obj\Debug\netcoreapp2.1\AtividadeWiki2.dll
+C:\Users\andre.garcia\source\repos\AtividadeWiki2\AtividadeWiki2\obj\Debug\netcoreapp2.1\AtividadeWiki2.pdb
