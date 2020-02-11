@@ -38,9 +38,9 @@ namespace AtividadeWiki2
             OpcaoMenu menu = OpcaoMenu.Menu_Principal;
             ListaDeOS listaOS = new ListaDeOS();
 
-            listaOS.ListaOS.Add(new OrdemDeServico { Numero = 1, Abertura = DateTime.Now, Encerramento = null, Areas = null, Responsavel = "André" });
-            listaOS.ListaOS.Add(new OrdemDeServico { Numero = 2, Abertura = DateTime.Now.AddDays(-1), Encerramento = null, Areas = null, Responsavel = "André" });
-            listaOS.ListaOS.Add(new OrdemDeServico { Numero = 3, Abertura = DateTime.Now.AddDays(-2), Encerramento = null, Areas = null, Responsavel = "André" });
+            listaOS.ListaOS.Add(new OrdemDeServico { Numero = 1, Abertura = DateTime.Now, Encerramento = null, Areas = new List<Area>(), Responsavel = "André" });
+            listaOS.ListaOS.Add(new OrdemDeServico { Numero = 2, Abertura = DateTime.Now.AddDays(-1), Encerramento = null, Areas = new List<Area>(), Responsavel = "André" });
+            listaOS.ListaOS.Add(new OrdemDeServico { Numero = 3, Abertura = DateTime.Now.AddDays(-2), Encerramento = null, Areas = new List<Area>(), Responsavel = "André" });
 
             while (true)
             {
@@ -96,7 +96,8 @@ namespace AtividadeWiki2
                             Console.Write($"Código da OS: {item.Numero}, " +
                                           $"Data de abertura: {item.Abertura}, " +
                                           $"Responsável: {item.Responsavel}, " +
-                                          $"Encerramento: {item.Encerramento} \n");
+                                          $"Encerramento: {item.Encerramento} " +
+                                          $"Area: {item.SomaAreas(item)} \n");
                         }
 
                         Console.Write("\n\n\nPressione 'enter' para continuar...\n");
@@ -115,6 +116,28 @@ namespace AtividadeWiki2
                             if (comando != "0")
                             {
                                 RealizaEncerramentoOS(listaOS, comando);
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            Console.Write("Opção inválida");
+                            Console.Write("\nPressione 'enter' para continuar...\n");
+                            Console.ReadLine();
+                        }
+
+                        break;
+
+                    case OpcaoMenu.IncluirNovaArea:
+
+                        Console.Clear();
+                        Console.Write("Digite o número da OS para adicionar a área ou 0 para retornar ao Menu Principal: ");
+                        comando = Console.ReadLine();
+
+                        try
+                        {
+                            if (comando != "0")
+                            {
+                                AdicionarNovaArea(listaOS, comando);
                             }
                         }
                         catch (Exception)
@@ -173,6 +196,13 @@ namespace AtividadeWiki2
 
             os = listaOS.ListaOS.Find(x => x.Numero.ToString() == numero);
 
+            if (os==null)
+            {
+                Console.Write("\nOS não encontrada no sistema. Pressione qualquer tecla para continuar...\n");
+                Console.ReadLine();
+                return;
+            }
+
             try
             {
                 Console.Write("\nInforme a data de encerramento: \n");
@@ -186,6 +216,56 @@ namespace AtividadeWiki2
             catch (Exception)
             {
                 Console.Write("\nOcorreu um erro na abertura da OS.");
+                Console.Write("\nPressione qualquer tecla para continuar...\n");
+                Console.ReadLine();
+            }
+        }
+
+        #endregion
+
+        #region AdicionarNovaArea
+        static void AdicionarNovaArea(ListaDeOS listaOS, string numero)
+        {
+            OrdemDeServico os = new OrdemDeServico();
+
+            os = listaOS.ListaOS.Find(x => x.Numero.ToString() == numero);
+
+            if (os == null)
+            {
+                Console.Write("\nOS não encontrada no sistema. Pressione qualquer tecla para continuar...\n");
+                Console.ReadLine();
+                return;
+            }
+
+            try
+            {
+                Console.Write("\nInforme o tamanho da área: \n");
+                var tamanho = Console.ReadLine();
+
+                Area area = new Area();
+
+                if (os.Areas != null)
+                {
+                    if (os.Areas.Count > 0)
+                        area.Codigo = os.Areas.Max(x => x.Codigo) + 1;
+                    else
+                        area.Codigo = 1;
+                } else
+                {
+                    area.Codigo = 1;
+                }
+                
+
+                area.Tamanho = Convert.ToDecimal(tamanho);
+
+                os.Areas.Add(area);
+
+                Console.Write("\nÁrea adicionada com sucesso. Pressione qualquer tecla para continuar...\n");
+                Console.ReadLine();
+            }
+            catch (Exception)
+            {
+                Console.Write("\nOcorreu um erro ao adicionar a área.");
                 Console.Write("\nPressione qualquer tecla para continuar...\n");
                 Console.ReadLine();
             }
@@ -213,7 +293,6 @@ namespace AtividadeWiki2
     {
         public OrdemDeServico()
         {
-
         }
 
         public long Numero { get; set; }
@@ -221,6 +300,18 @@ namespace AtividadeWiki2
         public DateTime? Encerramento { get; set; }
         public string Responsavel { get; set; }
         public List<Area> Areas { get; set; }
+
+        public decimal SomaAreas(OrdemDeServico os)
+        {
+            decimal total = 0;
+
+            foreach (var item in os.Areas)
+            {
+                total += item.Tamanho;    
+            }
+
+            return total;
+        }
 
     }
 
