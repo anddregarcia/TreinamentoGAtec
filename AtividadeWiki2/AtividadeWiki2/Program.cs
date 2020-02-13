@@ -36,11 +36,13 @@ namespace AtividadeWiki2
         static void Main(string[] args)
         {
             OpcaoMenu menu = OpcaoMenu.Menu_Principal;
-            ListaDeOS listaOS = new ListaDeOS();
-
-            listaOS.ListaOS.Add(new OrdemDeServico { Numero = 1, Abertura = DateTime.Now, Encerramento = null, Areas = new List<Area>(), Responsavel = "André" });
-            listaOS.ListaOS.Add(new OrdemDeServico { Numero = 2, Abertura = DateTime.Now.AddDays(-1), Encerramento = null, Areas = new List<Area>(), Responsavel = "André" });
-            listaOS.ListaOS.Add(new OrdemDeServico { Numero = 3, Abertura = DateTime.Now.AddDays(-2), Encerramento = null, Areas = new List<Area>(), Responsavel = "André" });
+            
+            ListaDeOS.ListaOS = new List<OrdemDeServico>
+            {
+                new OrdemDeServico { Numero = 1, Abertura = DateTime.Now, Encerramento = null, Areas = new List<Area>(), Responsavel = "André" },
+                new OrdemDeServico { Numero = 2, Abertura = DateTime.Now.AddDays(-5), Encerramento = null, Areas = new List<Area>(), Responsavel = "José" },
+                new OrdemDeServico { Numero = 3, Abertura = DateTime.Now.AddDays(-10), Encerramento = null, Areas = new List<Area>(), Responsavel = "Pelé" }
+            };
 
             while (true)
             {
@@ -50,7 +52,7 @@ namespace AtividadeWiki2
 
                 try
                 {
-                    menu = (OpcaoMenu)Convert.ToInt32(comando);
+                    menu = (OpcaoMenu)int.Parse(comando);
                 }
                 catch (Exception)
                 {
@@ -74,7 +76,7 @@ namespace AtividadeWiki2
                         {
                             if (comando != "0")
                             {
-                                RealizaAberturaOS(listaOS, comando);
+                                RealizaAberturaOS(comando);
                             }
                         }
                         catch (Exception)
@@ -91,7 +93,7 @@ namespace AtividadeWiki2
                         Console.Clear();
                         Console.Write("Lista de OS cadastradas no sistema\n\n");
 
-                        foreach (var item in listaOS.ListaOS)
+                        foreach (var item in ListaDeOS.ListaOS)
                         {
                             Console.Write($"Código da OS: {item.Numero}, " +
                                           $"Data de abertura: {item.Abertura}, " +
@@ -115,7 +117,7 @@ namespace AtividadeWiki2
                         {
                             if (comando != "0")
                             {
-                                RealizaEncerramentoOS(listaOS, comando);
+                                RealizaEncerramentoOS(comando);
                             }
                         }
                         catch (Exception)
@@ -137,7 +139,7 @@ namespace AtividadeWiki2
                         {
                             if (comando != "0")
                             {
-                                AdicionarNovaArea(listaOS, comando);
+                                AdicionarNovaArea(comando);
                             }
                         }
                         catch (Exception)
@@ -159,22 +161,20 @@ namespace AtividadeWiki2
         #endregion
 
         #region RealizaAberturaOS
-        static void RealizaAberturaOS(ListaDeOS listaOS, string data)
+        static void RealizaAberturaOS(string data)
         {
-            OrdemDeServico os = new OrdemDeServico();
-
-            if (listaOS.ListaOS.Count > 0)
-                os.Numero = listaOS.ListaOS.Max(x => x.Numero) + 1;
-            else
-                os.Numero = 1;
+            OrdemDeServico os = new OrdemDeServico
+            {
+                Numero = ListaDeOS.ListaOS.ProximoID()
+            };
 
             try
             {
-                os.Abertura = Convert.ToDateTime(data);
+                os.Abertura = DateTime.Parse(data);
                 Console.Write("\nInforme o nome do responsável: ");
                 os.Responsavel = Console.ReadLine();
 
-                listaOS.ListaOS.Add(os);
+                ListaDeOS.ListaOS.Add(os);
 
                 Console.Write("\nOS criada com sucesso. Pressione qualquer tecla para continuar...\n");
                 Console.ReadLine();
@@ -190,11 +190,10 @@ namespace AtividadeWiki2
         #endregion
 
         #region RealizaEncerramentoOS
-        static void RealizaEncerramentoOS(ListaDeOS listaOS, string numero)
+        static void RealizaEncerramentoOS(string numero)
         {
-            OrdemDeServico os = new OrdemDeServico();
-
-            os = listaOS.ListaOS.Find(x => x.Numero.ToString() == numero);
+            OrdemDeServico os =
+                ListaDeOS.LocalizaOS(numero);
 
             if (os==null)
             {
@@ -215,20 +214,18 @@ namespace AtividadeWiki2
             }
             catch (Exception)
             {
-                Console.Write("\nOcorreu um erro na abertura da OS.");
+                Console.Write("\nOcorreu um erro no encerramento da OS.");
                 Console.Write("\nPressione qualquer tecla para continuar...\n");
                 Console.ReadLine();
             }
         }
-
         #endregion
 
         #region AdicionarNovaArea
-        static void AdicionarNovaArea(ListaDeOS listaOS, string numero)
+        static void AdicionarNovaArea(string numero)
         {
-            OrdemDeServico os = new OrdemDeServico();
-
-            os = listaOS.ListaOS.Find(x => x.Numero.ToString() == numero);
+            OrdemDeServico os =
+                ListaDeOS.LocalizaOS(numero);
 
             if (os == null)
             {
@@ -241,24 +238,12 @@ namespace AtividadeWiki2
             {
                 Console.Write("\nInforme o tamanho da área: \n");
                 var tamanho = Console.ReadLine();
-
-                Area area = new Area();
-
-                if (os.Areas != null)
-                {
-                    if (os.Areas.Count > 0)
-                        area.Codigo = os.Areas.Max(x => x.Codigo) + 1;
-                    else
-                        area.Codigo = 1;
-                } else
-                {
-                    area.Codigo = 1;
-                }
                 
-
-                area.Tamanho = Convert.ToDecimal(tamanho);
-
-                os.Areas.Add(area);
+                os.Areas.Add(
+                    new Area {
+                        Codigo = os.Areas.ProximoID(),
+                        Tamanho = decimal.Parse(tamanho)
+                    });
 
                 Console.Write("\nÁrea adicionada com sucesso. Pressione qualquer tecla para continuar...\n");
                 Console.ReadLine();
@@ -293,6 +278,7 @@ namespace AtividadeWiki2
     {
         public OrdemDeServico()
         {
+            this.Areas = new List<Area>();
         }
 
         public long Numero { get; set; }
@@ -304,23 +290,18 @@ namespace AtividadeWiki2
         public decimal SomaAreas(OrdemDeServico os)
         {
             decimal total = 0;
-
             foreach (var item in os.Areas)
             {
                 total += item.Tamanho;    
             }
-
             return total;
         }
-
     }
 
     public class Area
     {
         public Area()
-        {
-
-        }
+        { }
 
         public long Codigo { get; set; }
         public decimal Tamanho { get; set; }
@@ -329,9 +310,20 @@ namespace AtividadeWiki2
 
     public static class Auxiliar
     {
-        static long ProximoID(this List<OrdemDeServico> lista)
+        public static long ProximoID(this List<OrdemDeServico> lista)
         {
-            return lista.Max(x => x.Numero) + 1;
+            if(lista.Count > 0)
+                return lista.Max(x => x.Numero) + 1L;
+            else
+                return 1L;
+        }
+
+        public static long ProximoID(this List<Area> lista)
+        {
+            if (lista.Count > 0)
+                return lista.Max(x => x.Codigo) + 1L;
+            else
+                return 1L;
         }
     }
 
@@ -342,11 +334,17 @@ namespace AtividadeWiki2
             ListaOS = new List<OrdemDeServico>();
         }
 
-        public List<OrdemDeServico> ListaOS { get; set; }
+        public static List<OrdemDeServico> ListaOS { get; set; }
+
+        public static OrdemDeServico LocalizaOS(string codigo)
+        {
+            return ListaDeOS.ListaOS.Find(x => x.Numero.ToString() == codigo);
+        }
     }
 
     #endregion
 
+    #region Enumeradores
     public enum OpcaoMenu
     {
         Menu_Principal = -1,
@@ -357,4 +355,5 @@ namespace AtividadeWiki2
         IncluirNovaArea = 4
     }
 
+    #endregion
 }
